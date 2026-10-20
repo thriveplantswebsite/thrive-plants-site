@@ -1,0 +1,20 @@
+{
+  "collect": {
+    "enabled": true,
+    "label": "Collect from the Houseplant Hospital",
+    "note": "We'll message you to arrange a time."
+  },
+  "local": {
+    "enabled": true,
+    "label": "Local delivery",
+    "note": "[PLACEHOLDER] Delivered by hand, usually within a week.",
+    "price": 5,
+    "districts": "BS1, BS2, BS3, BS4, BS5, BS6, BS7, BS8, BS9"
+  },
+  "courier": {
+    "enabled": false,
+    "label": "Packed and posted, UK",
+    "note": "",
+    "price": 0
+  }
+}

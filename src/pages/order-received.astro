@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import { single } from '../lib/content';
+
+/* Where Stripe sends someone after paying. Says nothing it cannot know, as
+   on the Molly build: Stripe has already emailed a receipt with the real
+   detail, and restating the order here would be a second source of truth
+   about money. The page is the same for everyone, so it stays static; the
+   ?type=voucher wording is picked in the browser. */
+const shop = await single('shopPage');
+const vouchers = await single('vouchersPage');
+---
+<Base title="Thank you" noindex>
+  <section class="page-hero compact">
+    <div class="wrap">
+      <span class="eyebrow">Thank you</span>
+      <h1>All <em>sorted.</em></h1>
+      <p class="lead" data-shop>{shop.afterOrder}</p>
+      <p class="lead" data-voucher hidden>{vouchers.afterOrder}</p>
+      <div class="btn-row"><a href="/" class="btn">Back to the home page</a></div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { clear } from '../lib/basket';
+  const voucher = new URLSearchParams(location.search).get('type') === 'voucher';
+  document.querySelector<HTMLElement>('[data-voucher]')!.hidden = !voucher;
+  document.querySelector<HTMLElement>('[data-shop]')!.hidden = voucher;
+  /* The basket is emptied HERE, not when checkout starts: someone who reaches
+     Stripe and changes their mind should come back to their basket intact.
+     Reaching this page is the only proof the payment happened. */
+  if (!voucher) clear();
+</script>

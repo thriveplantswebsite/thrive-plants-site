@@ -1,0 +1,22 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+/* /privacy and /returns, built only once she has written them. */
+export async function getStaticPaths() {
+  if (!Object.keys(import.meta.glob('../content/legal/*.mdoc')).length) return [];
+  const pages = await getCollection('legal');
+  return pages.map((entry) => ({ params: { legal: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<Base title={entry.data.title}>
+  <section class="page-hero compact"><div class="wrap"><h1>{entry.data.title}</h1></div></section>
+  <section class="section section-tight"><div class="wrap narrow prose"><Content /></div></section>
+</Base>
+
+<style>
+  .prose :global(p), .prose :global(li) { color: var(--ink-soft); max-width: 68ch; }
+  .prose :global(h2) { font-size: 1.8rem; margin-top: 2rem; }
+</style>

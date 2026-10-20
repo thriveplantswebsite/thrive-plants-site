@@ -1,0 +1,13 @@
+{
+  "tagline": "Bristol's houseplant hospital. Don't bin it. Book it in.",
+  "description": "Sick, sad or struggling houseplant? Thrive Plants Bristol diagnose, treat and revive it. Drop off at the Houseplant Hospital or book a pick-up across BS1 to BS9, from £8.",
+  "whatsapp": "https://wa.me/qr/CC5KLPTIHACMH1",
+  "instagram": "https://www.instagram.com/thriveplantsbristol/",
+  "email": "",
+  "serviceArea": "BS1 to BS9",
+  "calUser": "thrive-plants-bristol",
+  "dropOffEvent": "drop-off",
+  "pickUpEvent": "pick-up",
+  "shareImage": "../assets/images/pages/philodendron-sun.jpg",
+  "shareImageAlt": "A large philodendron in a pot against a sunlit wall"
+}

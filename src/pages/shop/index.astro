@@ -1,0 +1,55 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import Icon from '../../components/Icon.astro';
+import { single, shopProducts } from '../../lib/content';
+
+const shop = await single('shopPage');
+const products = await shopProducts();
+const icons = ['recycle', 'heart-pulse', 'clipboard-check'];
+---
+<Base title="Shop" description={shop.intro}>
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">The shop{shop.comingSoon && ' · coming soon'}</span>
+      <h1>{shop.heading}</h1>
+      <p class="lead">{shop.intro}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      {products.length > 0 ? (
+        <div class="products">
+          {products.map((p, i) => <ProductCard product={p} comingSoon={shop.comingSoon} priority={i < 4} />)}
+        </div>
+      ) : (
+        <p class="lead">New plants are on their way. Check back soon.</p>
+      )}
+    </div>
+  </section>
+
+  {shop.promises.length > 0 && (
+    <section class="section band">
+      <div class="wrap promise">
+        {shop.promises.map((p, i) => (
+          <div class="reveal">
+            <Icon name={icons[i] ?? 'leaf'} size={30} />
+            <h3>{p.title}</h3>
+            <p>{p.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px 20px; }
+  @media (max-width: 1020px) { .products { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 700px) { .products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; } }
+  .promise { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+  .promise :global(.icon) { color: var(--lime-bright); margin-bottom: 1rem; }
+  .promise p { margin: 0; }
+  @media (max-width: 760px) { .promise { grid-template-columns: 1fr; } }
+</style>

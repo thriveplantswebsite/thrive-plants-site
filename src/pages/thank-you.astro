@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import { single } from '../lib/content';
+
+/* Where both enquiry forms land. Promises no reply time: that is hers to
+   set, since she is the one who has to keep it. */
+const c = await single('contactPage');
+---
+<Base title="Message sent" noindex>
+  <section class="page-hero compact">
+    <div class="wrap">
+      <span class="eyebrow">Message sent</span>
+      <h1>Thank <em>you.</em></h1>
+      <p class="lead">{c.afterMessage}</p>
+      <div class="btn-row">
+        <a href="/" class="btn">Back to the home page</a>
+        <a href="/book" class="btn btn-ghost">Book a slot</a>
+      </div>
+    </div>
+  </section>
+</Base>

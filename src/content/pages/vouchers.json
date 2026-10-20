@@ -1,0 +1,16 @@
+{
+  "heading": "Give the gift of a plant check-up.",
+  "intro": "For the friend with a droopy fiddle leaf fig, or anyone who loves their plants. Vouchers can be used on any hospital treatment or in the shop.",
+  "amounts": [
+    15,
+    25,
+    50,
+    75
+  ],
+  "points": [
+    "[PLACEHOLDER] Sent by email as a printable voucher",
+    "[PLACEHOLDER] Valid for 12 months",
+    "Use it on treatments, pick-ups or the shop"
+  ],
+  "afterOrder": "Thank you. Your receipt is on its way by email, and we'll send the voucher itself within a day."
+}

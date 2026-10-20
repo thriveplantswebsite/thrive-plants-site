@@ -1,0 +1,129 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import BasketButton from '../../components/BasketButton.astro';
+import Icon from '../../components/Icon.astro';
+import { single, shopProducts } from '../../lib/content';
+import { formatPrice } from '../../lib/shop';
+
+export async function getStaticPaths() {
+  const products = await shopProducts();
+  return products.map((product, i) => ({
+    params: { id: product.id },
+    props: { product, next: products[(i + 1) % products.length] },
+  }));
+}
+
+const { product, next } = Astro.props;
+const p = product.data;
+const shop = await single('shopPage');
+const { Content } = await render(product);
+const sold = p.status === 'sold';
+/* Built here, not inline: a template string nested inside another in a tag
+   attribute sends the Astro compiler into a loop that never finishes. */
+const description = (p.pot ? p.title + ', ' + p.pot.toLowerCase() : p.title) + '. A one-off from the thrive shop.';
+
+/* Prepared here rather than inside the template: an async function in the
+   markup stalled the build indefinitely at "Building server entrypoints". */
+const photos = await Promise.all(
+  p.images.map(async (img) => {
+    const big = await getImage({ src: img.image, widths: [500, 800, 1200], sizes: '(max-width: 860px) 100vw, 55vw' });
+    return { src: big.src, srcset: big.srcSet.attribute, alt: img.alt || p.title };
+  }),
+);
+
+const mainImage = await getImage({ src: p.images[0].image, width: 1200, format: 'jpg' });
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: p.title,
+  description: p.pot,
+  image: new URL(mainImage.src, Astro.site).href,
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'GBP',
+    price: p.price.toFixed(2),
+    availability: sold ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+  },
+};
+---
+<Base title={p.title} description={description} image={p.images[0].image} imageAlt={p.images[0].alt} ogType="product" schema={schema}>
+  <section class="section section-tight">
+    <div class="wrap">
+      <a href="/shop" class="link-arrow back"><Icon name="arrow-left" /> Back to the shop</a>
+      <div class="item" data-product={product.id} data-sold={sold ? 'true' : undefined}>
+        <div class="gallery">
+          <div class="main ph">
+            <Image src={p.images[0].image} alt={p.images[0].alt || p.title} widths={[500, 800, 1200]} sizes="(max-width: 860px) 100vw, 55vw" loading="eager" id="main-photo" />
+          </div>
+          {p.images.length > 1 && (
+            <div class="thumbs">
+              {p.images.map((img, i) => (
+                <button type="button" class:list={['thumb', { on: i === 0 }]} data-index={i} aria-label={`Show photo ${i + 1}`}>
+                  <Image src={img.image} alt="" widths={[160]} sizes="80px" />
+                </button>
+              ))}
+            </div>
+          )}
+          {/* The full-size versions the thumbnails swap in, as data rather
+              than images, so the browser downloads only the photo someone
+              taps rather than every photo up front. */}
+          <script type="application/json" id="photo-data" is:inline set:html={JSON.stringify(photos)} />
+        </div>
+
+        <div class="info">
+          <span class="eyebrow">One of a kind</span>
+          <h1>{p.title}</h1>
+          {p.pot && <p class="lead">{p.pot}</p>}
+          <p class="price">{formatPrice(p.price)}</p>
+          <ul class="meta">
+            {p.easyCare && <li><Icon name="sprout" /> Easy care</li>}
+            {p.petSafe && <li><Icon name="heart-pulse" /> Pet safe</li>}
+            <li><Icon name="clipboard-check" /> Comes with a care card</li>
+          </ul>
+          <div class="buy"><BasketButton id={product.id} comingSoon={shop.comingSoon} sold={sold} /></div>
+          {shop.comingSoon && <p class="small">The shop opens soon. In the meantime, ask about this one on WhatsApp or through the contact page.</p>}
+          <div class="details"><Content /></div>
+        </div>
+      </div>
+
+      {next && next.id !== product.id && (
+        <a href={`/shop/${next.id}`} class="link-arrow next">Next: {next.data.title} <Icon name="arrow-right" /></a>
+      )}
+    </div>
+  </section>
+</Base>
+
+<script>
+  const main = document.getElementById('main-photo') as HTMLImageElement | null;
+  const photos: { src: string; srcset: string; alt: string }[] = JSON.parse(document.getElementById('photo-data')?.textContent || '[]');
+  document.querySelectorAll<HTMLButtonElement>('.thumb').forEach((t) => {
+    t.addEventListener('click', () => {
+      const photo = photos[Number(t.dataset.index)];
+      if (!main || !photo) return;
+      main.srcset = photo.srcset;
+      main.src = photo.src;
+      main.alt = photo.alt;
+      document.querySelectorAll('.thumb').forEach((x) => x.classList.toggle('on', x === t));
+    });
+  });
+</script>
+
+<style>
+  .back { margin-bottom: 2rem; }
+  .item { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+  .main { aspect-ratio: 1 / 1.05; padding: 8%; }
+  .main :global(img) { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 18px 18px rgba(0,0,0,.4)); }
+  .item[data-sold] .main :global(img) { opacity: .5; filter: grayscale(.6); }
+  .thumbs { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .thumb { width: 80px; height: 80px; padding: 6px; background: var(--surface); border: 1px solid var(--line); }
+  .thumb.on { border-color: var(--lime); }
+  .thumb :global(img) { width: 100%; height: 100%; object-fit: contain; }
+  .info h1 { font-size: clamp(2.4rem, 5vw, 4rem); }
+  .price { font-family: var(--display); font-size: 2rem; margin: .5rem 0 1rem; }
+  .buy { margin: 1.5rem 0 1rem; }
+  .details { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--ink-soft); }
+  .next { margin-top: 3rem; }
+  @media (max-width: 860px) { .item { grid-template-columns: 1fr; } }
+</style>

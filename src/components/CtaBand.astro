@@ -1,0 +1,17 @@
+---
+/* The closing band on most pages. One component so the line stays the same
+   everywhere: it is her slogan, not page copy. */
+interface Props { heading?: string; emphasis?: string; href?: string; label?: string }
+const {
+  heading = "Don't bin it.",
+  emphasis = 'Book it in.',
+  href = '/book',
+  label = 'Book your plant in',
+} = Astro.props;
+---
+<section class="cta-band">
+  <div class="wrap">
+    <h2>{heading} <em>{emphasis}</em></h2>
+    <a href={href} class="btn">{label}</a>
+  </div>
+</section>

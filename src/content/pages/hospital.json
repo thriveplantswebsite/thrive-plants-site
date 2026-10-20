@@ -1,0 +1,61 @@
+{
+  "heading": "We diagnose, treat and revive.",
+  "intro": "From a quick repot to full pest treatment, every plant is properly assessed and goes home with its own care card.",
+  "dropOff": "Book a 15 minute slot to bring your plant to the thrive Houseplant Hospital. We'll check your plants on arrival and give an assessment of what they need to thrive.",
+  "pickUp": "We collect from your doorstep, take your plant to the Houseplant Hospital for a full assessment and treatment, then return it once it's ready. BS1 to BS9. Free collection for 3 or more plants, or £8 for 1 or 2.",
+  "treatmentsHeading": "What we can do",
+  "treatments": [
+    {
+      "name": "Health check and diagnosis",
+      "description": "A proper look at leaves, roots and soil, and a plan.",
+      "price": "From £8"
+    },
+    {
+      "name": "Repotting",
+      "description": "Fresh mix, a root tidy, and a pre-loved pot if it needs one.",
+      "price": "From £8"
+    },
+    {
+      "name": "Pest treatment",
+      "description": "Mealybugs, spider mites, fungus gnats, scale and thrips.",
+      "price": "On assessment"
+    },
+    {
+      "name": "Full rescue",
+      "description": "Root rot, overwatering and serious decline.",
+      "price": "On assessment"
+    },
+    {
+      "name": "Prune and propagate",
+      "description": "Tame an out of control plant, and save cuttings to grow on.",
+      "price": "On assessment"
+    }
+  ],
+  "treatmentsNote": "[PLACEHOLDER] Prices to be confirmed by Mandie.",
+  "careCard": {
+    "plant": "Monstera deliciosa",
+    "light": "Bright, indirect. Not in a south window.",
+    "water": "When the top 3cm of soil is dry.",
+    "feed": "Monthly, spring to late summer.",
+    "treated": "Root rot. Trimmed and repotted into chunky aroid mix."
+  },
+  "faqs": [
+    {
+      "question": "How long will my plant stay at the hospital?",
+      "answer": "[PLACEHOLDER] It depends on the treatment. A repot can be the same week; a pest treatment or full rescue needs longer so we can check it's really working. We'll always give you an estimate at drop-off."
+    },
+    {
+      "question": "What if my plant can't be saved?",
+      "answer": "[PLACEHOLDER] We'll be honest with you. Often we can still take healthy cuttings and propagate them, so a piece of your plant lives on."
+    },
+    {
+      "question": "Do you treat orchids and succulents?",
+      "answer": "[PLACEHOLDER] Yes. Orchids struggling after the summer heat are a regular visitor, and succulents and cacti are welcome too."
+    },
+    {
+      "question": "Where is the Houseplant Hospital?",
+      "answer": "In Bristol. You'll get the full address when you book your drop-off slot."
+    }
+  ],
+  "image": "../../assets/images/pages/monstera-curtain.jpg"
+}

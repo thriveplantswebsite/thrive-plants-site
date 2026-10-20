@@ -1,0 +1,69 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { single } from '../lib/content';
+
+const b = await single('businessPage');
+const offerIcons = ['package', 'calendar-days', 'heart-pulse'];
+---
+<Base title="For Business" description={b.intro.replace('[PLACEHOLDER] ', '')}>
+  <section class="page-hero">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">For offices, restaurants and cafés</span>
+        <h1>{b.heading}</h1>
+        <p class="lead">{b.intro}</p>
+        <div class="btn-row"><a href="#form" class="btn">Get a quote</a></div>
+      </div>
+      {b.image && <div class="ph hero-photo"><Image src={b.image} alt={b.imageAlt} widths={[500, 900]} sizes="(max-width: 860px) 100vw, 45vw" loading="eager" /></div>}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap offers">
+      {b.offers.map((o, i) => (
+        <div class="card reveal">
+          <Icon name={offerIcons[i] ?? 'leaf'} size={30} />
+          <h3>{o.title}</h3>
+          <p>{o.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="section-head"><span class="eyebrow">Who it's for</span><h2>{b.whoHeading}</h2></div>
+      <div class="who">
+        {b.who.map((w) => <div class="reveal"><Icon name={w.icon} size={28} /><span>{w.label}</span></div>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap narrow">
+      <div class="section-head"><span class="eyebrow">Enquire</span><h2>{b.formHeading}</h2></div>
+      {b.formIntro && <p class="lead intro">{b.formIntro}</p>}
+      <EnquiryForm form="business" />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+  .hero-photo { aspect-ratio: 1 / 1; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .hero-photo { aspect-ratio: 4 / 3; } }
+  .offers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 860px) { .offers { grid-template-columns: 1fr; } }
+  .who { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .who div {
+    display: flex; flex-direction: column; gap: 14px; padding: 1.5rem;
+    background: rgba(0,0,0,.18); border: 1px solid rgba(241,237,226,.25);
+    font-family: var(--display); text-transform: uppercase; letter-spacing: .04em;
+  }
+  .who :global(.icon) { color: var(--lime-bright); }
+  @media (max-width: 760px) { .who { grid-template-columns: 1fr 1fr; } }
+  .intro { margin-bottom: 2rem; }
+</style>

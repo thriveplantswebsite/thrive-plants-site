@@ -1,0 +1,135 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { single } from '../lib/content';
+
+const h = await single('hospitalPage');
+
+/* FAQ answers as structured data, so Google can show them under her
+   listing. Placeholder answers are left out: they are not hers yet. */
+const faqs = h.faqs.filter((f) => f.question && f.answer && !f.answer.includes('[PLACEHOLDER]'));
+const schema = faqs.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })),
+    }
+  : undefined;
+---
+<Base title="Plant Hospital" description={h.intro} schema={schema}>
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">The thrive Houseplant Hospital</span>
+      <h1>{h.heading}</h1>
+      <p class="lead">{h.intro}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head"><span class="eyebrow">Two ways in</span><h2>Drop it off or <em>we'll pick it up</em></h2></div>
+      <div class="ways">
+        <div class="card reveal">
+          <Icon name="map-pin" size={30} />
+          <h3>Drop off</h3>
+          <p>{h.dropOff}</p>
+          <a href="/book" class="btn">Book a drop-off</a>
+        </div>
+        <div class="card reveal d1">
+          <Icon name="truck" size={30} />
+          <h3>Pick up</h3>
+          <p>{h.pickUp}</p>
+          <a href="/book?type=pick-up" class="btn btn-ghost">Arrange a pick-up</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap treat">
+      <div>
+        <div class="section-head"><span class="eyebrow">Treatments</span><h2>{h.treatmentsHeading}</h2></div>
+        <ul class="prices">
+          {h.treatments.map((t) => (
+            <li>
+              <div><strong>{t.name}</strong><span>{t.description}</span></div>
+              <b>{t.price}</b>
+            </li>
+          ))}
+        </ul>
+        {h.treatmentsNote && <p class="small">{h.treatmentsNote}</p>}
+      </div>
+
+      <aside class="carecard reveal" aria-label="An example care card">
+        <div class="carecard-head"><span class="label">Care card</span><span class="label">Every plant gets one</span></div>
+        <p class="label">Patient</p>
+        <p class="plant">{h.careCard.plant}</p>
+        <dl>
+          <div><dt><Icon name="sun" size={16} /> Light</dt><dd>{h.careCard.light}</dd></div>
+          <div><dt><Icon name="droplet" size={16} /> Water</dt><dd>{h.careCard.water}</dd></div>
+          <div><dt><Icon name="sprout" size={16} /> Feed</dt><dd>{h.careCard.feed}</dd></div>
+          <div><dt><Icon name="clipboard-check" size={16} /> Treated</dt><dd>{h.careCard.treated}</dd></div>
+        </dl>
+        <p class="sign">Thrive on! <span>Mandie</span></p>
+      </aside>
+    </div>
+  </section>
+
+  {h.faqs.length > 0 && (
+    <section class="section">
+      <div class="wrap narrow">
+        <div class="section-head"><span class="eyebrow">Questions</span><h2>Good to <em>know</em></h2></div>
+        <div class="faq">
+          {h.faqs.map((f, i) => (
+            <details open={i === 0}>
+              <summary>{f.question}</summary>
+              <p>{f.answer}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</Base>
+
+<style>
+  .ways { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .ways h3 { font-size: 2rem; }
+  .ways .btn { margin-top: 0.5rem; }
+  @media (max-width: 760px) { .ways { grid-template-columns: 1fr; } }
+
+  .treat { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+  @media (max-width: 900px) { .treat { grid-template-columns: 1fr; } }
+  .prices { list-style: none; padding: 0; margin: 0 0 1rem; }
+  .prices li { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding: 1.2rem 0; border-bottom: 1px solid rgba(241,237,226,.3); }
+  .prices li:first-child { border-top: 1px solid rgba(241,237,226,.3); }
+  .prices strong { display: block; font-size: 1.15rem; font-weight: 500; }
+  .prices span { color: var(--ink-on-band); font-size: .97rem; }
+  .prices b { white-space: nowrap; font-family: var(--display); font-weight: 500; font-size: 1.15rem; color: var(--lime-bright); text-transform: uppercase; letter-spacing: .04em; }
+
+  /* The care card is the one light object on a dark site: it is meant to
+     read as the physical card that goes home with the plant. */
+  .carecard { background: #f1ede2; color: #1a1f1a; padding: 1.75rem; transform: rotate(1.5deg); box-shadow: 0 24px 50px -24px rgba(0,0,0,.6); }
+  .carecard .label { color: #4d5448; }
+  .carecard-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 1rem; margin-bottom: 1.25rem; border-bottom: 1.5px dashed rgba(26,31,26,.35); }
+  .carecard-head .label:first-child { color: #a2582f; font-weight: 600; }
+  .plant { font-family: var(--display); font-weight: 600; text-transform: uppercase; font-size: 1.7rem; line-height: 1.1; margin-bottom: 1.25rem; }
+  .carecard dl { margin: 0; display: grid; gap: 12px; }
+  .carecard dl div { display: grid; grid-template-columns: 96px 1fr; gap: 12px; font-size: .95rem; }
+  .carecard dt { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+  .carecard dt :global(.icon) { color: #3e5a37; }
+  .carecard dd { margin: 0; color: #4d5448; }
+  .sign { margin: 1.5rem 0 0; font-family: var(--display); text-transform: uppercase; font-size: 1.3rem; }
+  .sign span { font-family: var(--body); text-transform: none; font-size: .9rem; color: #4d5448; margin-left: .3em; }
+
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq details:first-child { border-top: 1px solid var(--line); }
+  .faq summary { list-style: none; cursor: pointer; padding: 1.3rem 2.5rem 1.3rem 0; position: relative; font-family: var(--display); text-transform: uppercase; letter-spacing: .03em; font-size: 1.25rem; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 1.6rem; color: var(--lime); transition: transform .2s var(--ease); }
+  .faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+  .faq p { color: var(--ink-soft); padding-bottom: 1.25rem; margin: 0; max-width: 62ch; }
+</style>

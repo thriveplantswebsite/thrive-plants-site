@@ -1,0 +1,8 @@
+# [PLACEHOLDER] Hidden from search engines until launch, so the preview at
+# *.workers.dev is not indexed as a duplicate of the real site.
+# At launch, replace everything below with:
+#   User-agent: *
+#   Allow: /
+#   Sitemap: https://YOUR-DOMAIN/sitemap-index.xml
+User-agent: *
+Disallow: /

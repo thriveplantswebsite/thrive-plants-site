@@ -1,0 +1,25 @@
+---
+import { ICONS } from '../lib/icons';
+
+/* Lucide icons, inlined as SVG at build time. No icon font and no
+   JavaScript: the page ships exactly the icons it uses.
+
+   Only icons listed in src/lib/icons.ts exist. An unknown name renders
+   nothing rather than failing the build, because the name may have come
+   from the CMS. */
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+  label?: string;
+}
+const { name, size = 24, class: cls = '', label } = Astro.props;
+
+const raw = ICONS[name];
+
+const svg = raw
+  ?.replace(/width="\d+"/, `width="${size}"`)
+  .replace(/height="\d+"/, `height="${size}"`)
+  .replace('<svg', `<svg class="icon ${cls}" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"'}`);
+---
+{svg && <Fragment set:html={svg} />}

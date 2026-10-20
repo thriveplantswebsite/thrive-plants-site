@@ -1,0 +1,102 @@
+---
+import { getImage } from 'astro:assets';
+import '@fontsource-variable/oswald';
+import '@fontsource-variable/jost';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { single } from '../lib/content';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  /** A page-specific share image, e.g. a product photo. */
+  image?: ImageMetadata | null;
+  imageAlt?: string;
+  ogType?: string;
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+}
+const { title, noindex = false, image, imageAlt, ogType = 'website', schema } = Astro.props;
+const settings = await single('settings');
+
+const siteName = 'thrive plants bristol';
+const fullTitle = title ? `${title} · ${siteName}` : `${siteName} · Bristol's houseplant hospital`;
+/* || not ??: Keystatic saves an emptied box as "" and that should fall back
+   rather than publish an empty description. */
+const description =
+  Astro.props.description || settings.description ||
+  "Sick, sad or struggling houseplant? Bristol's houseplant hospital diagnoses, treats and revives.";
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+/* Share images must be absolute URLs and are read by platforms that ignore
+   srcset, so one fixed 1200px JPEG is made at build time. */
+const shareSource = image ?? settings.shareImage ?? null;
+const share = shareSource ? await getImage({ src: shareSource, width: 1200, format: 'jpg', quality: 82 }) : null;
+const ogImage = share ? new URL(share.src, Astro.site).href : null;
+const ogAlt = imageAlt || settings.shareImageAlt || siteName;
+
+/* Nothing may sit between the doctype and <html>, not even a comment. Astro
+   stops recognising the document root and silently drops <head> and every
+   stylesheet with it. (Learned on the Molly build.) */
+---
+<!doctype html>
+<html lang="en-GB" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#151b16" />
+
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content={ogType} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:site_name" content={siteName} />
+  <meta property="og:locale" content="en_GB" />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  {ogImage && <meta property="og:image:alt" content={ogAlt} />}
+  <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+
+  {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+  <script is:inline>document.documentElement.classList.remove('no-js');</script>
+</head>
+<body>
+  <a href="#main" class="skip">Skip to content</a>
+  <Header path={Astro.url.pathname} />
+  <main id="main"><slot /></main>
+  <Footer />
+
+  <style>
+    .skip {
+      position: absolute; left: 12px; top: -60px; z-index: 200;
+      background: var(--lime); color: var(--on-lime);
+      padding: 10px 16px; font-size: 0.9rem;
+    }
+    .skip:focus { top: 12px; }
+  </style>
+
+  <script>
+    /* Reveal on scroll. One observer for the page, unobserving as it goes. */
+    const items = document.querySelectorAll('.reveal');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('in'));
+    } else {
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }),
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      items.forEach((el) => io.observe(el));
+    }
+  </script>
+</body>
+</html>

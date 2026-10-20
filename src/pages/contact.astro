@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { single } from '../lib/content';
+
+const c = await single('contactPage');
+const settings = await single('settings');
+---
+<Base title="Contact" description={c.intro}>
+  <section class="page-hero compact">
+    <div class="wrap">
+      <span class="eyebrow">Contact</span>
+      <h1>{c.heading}</h1>
+      <p class="lead">{c.intro}</p>
+    </div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="wrap grid">
+      <EnquiryForm form="contact" />
+      <aside class="other">
+        <p class="label">Quicker ways</p>
+        {settings.whatsapp && <a class="btn btn-ghost btn-block" href={settings.whatsapp} target="_blank" rel="noopener"><Icon name="message-circle" /> WhatsApp</a>}
+        <a class="btn btn-ghost btn-block" href="/book"><Icon name="calendar-days" /> Book a slot</a>
+        {settings.email && <a class="btn btn-ghost btn-block" href={`mailto:${settings.email}`}><Icon name="mail" /> {settings.email}</a>}
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1.4fr 0.6fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+  .other { display: grid; gap: 12px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,21 @@
+{
+  "heading": "Happy plants in pre-loved pots.",
+  "intro": "Healthy plants rehomed in second-hand ceramic pots. Not every pot we use is new, and that's the point. Each one is a one-off.",
+  "comingSoon": true,
+  "promises": [
+    {
+      "title": "Second-hand pots",
+      "body": "[PLACEHOLDER] Rescued from charity shops and car boots, cleaned and given a new life."
+    },
+    {
+      "title": "Hospital-checked",
+      "body": "[PLACEHOLDER] Every plant is health-checked and pest-free before it goes to a new home."
+    },
+    {
+      "title": "Comes with a care card",
+      "body": "So you know exactly what it likes from day one."
+    }
+  ],
+  "emptyBasket": "Your basket is empty. Every plant in the shop is a one-off, so if you see one you love, grab it.",
+  "afterOrder": "Thank you. Your plant is yours, and a receipt is on its way by email. We'll be in touch to arrange collection or delivery."
+}

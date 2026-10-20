@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/thrive-logo-light.png';
+import { single } from '../lib/content';
+
+const settings = await single('settings');
+/* Only the small print she has actually written gets a link. See the note
+   on the legal collection in content.config.ts. */
+/* Checked with a glob first: getCollection warns on every page while the
+   folder is empty, which is the normal state until she writes these. */
+const hasLegal = Object.keys(import.meta.glob('../content/legal/*.mdoc')).length > 0;
+const legal = hasLegal ? (await getCollection('legal')).sort((a, b) => a.data.order - b.data.order) : [];
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap grid">
+    <div class="brand">
+      <Image src={logo} alt="thrive" height={128} widths={[128, 256]} sizes="128px" class="logo" />
+      {settings.tagline && <p>{settings.tagline}</p>}
+    </div>
+
+    <div>
+      <p class="label">Visit</p>
+      <a href="/hospital">Plant Hospital</a>
+      <a href="/shop">Shop</a>
+      <a href="/business">For Business</a>
+      <a href="/vouchers">Gift Vouchers</a>
+      <a href="/about">About</a>
+    </div>
+
+    <div>
+      <p class="label">Get in touch</p>
+      <a href="/book">Book a slot</a>
+      <a href="/contact">Send a message</a>
+      {settings.whatsapp && <a href={settings.whatsapp} target="_blank" rel="noopener">WhatsApp</a>}
+      {settings.instagram && (
+        <a href={settings.instagram} target="_blank" rel="noopener" class="ig">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" /></svg>
+          Instagram
+        </a>
+      )}
+      {settings.email && <a href={`mailto:${settings.email}`}>{settings.email}</a>}
+    </div>
+
+    <div>
+      <p class="label">Where</p>
+      <p class="plain">Bristol</p>
+      {settings.serviceArea && <p class="plain">Pick-ups and delivery across {settings.serviceArea}</p>}
+    </div>
+  </div>
+
+  <div class="wrap base">
+    <span>© {year} thrive plants bristol</span>
+    {legal.length > 0 && (
+      <span class="legal">{legal.map((l) => <a href={`/${l.id}`}>{l.data.navLabel}</a>)}</span>
+    )}
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: #0e120f; border-top: 1px solid var(--line); padding-block: clamp(3rem, 6vw, 5rem) 1.5rem; }
+  .grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 2rem; }
+  .brand :global(.logo) { height: 64px; width: auto; margin-bottom: 1rem; }
+  .brand p, .plain { color: var(--ink-soft); margin: 0 0 0.4rem; }
+  .grid > div:not(.brand) { display: flex; flex-direction: column; gap: 8px; }
+  .label { margin-bottom: 0.5rem; opacity: 0.8; }
+  .grid a { text-decoration: none; color: var(--ink); width: fit-content; }
+  .grid a:hover { color: var(--lime); }
+  .ig { display: inline-flex; align-items: center; gap: 6px; }
+  .ig svg { fill: none; stroke: currentColor; stroke-width: 2; }
+  .base {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
+    font-size: 0.85rem; color: var(--ink-soft);
+  }
+  .legal { display: flex; gap: 16px; }
+  .legal a { color: var(--ink-soft); }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+    .brand { grid-column: 1 / -1; }
+  }
+</style>

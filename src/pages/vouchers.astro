@@ -1,0 +1,117 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import logo from '../assets/brand/thrive-logo-light.png';
+import { single } from '../lib/content';
+
+const v = await single('vouchersPage');
+const shop = await single('shopPage');
+const amounts = [...new Set(v.amounts)].sort((a, b) => a - b);
+const start = amounts.includes(25) ? 25 : amounts[0];
+/* Vouchers go live with the shop. Both need Stripe, and a voucher someone
+   can buy but Mandie is not ready to honour is worse than "coming soon". */
+const open = !shop.comingSoon;
+const pointIcons = ['mail', 'calendar-days', 'sparkles'];
+---
+<Base title="Gift Vouchers" description={v.intro}>
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">Gift vouchers</span>
+      <h1>{v.heading}</h1>
+      <p class="lead">{v.intro}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap grid">
+      <div class="voucher" aria-hidden="true">
+        <Image src={logo} alt="" height={140} widths={[140, 280]} sizes="140px" class="v-logo" />
+        <span class="label">Plant care gift voucher</span>
+        <span class="amt" data-voucher-amt>£{start}</span>
+        <span class="small">thrive Houseplant Hospital · Bristol</span>
+      </div>
+
+      <div>
+        <h2>Choose an <em>amount</em></h2>
+        <form class="form" id="voucher-form">
+          <div class="amounts" role="radiogroup" aria-label="Voucher amount">
+            {amounts.map((a) => (
+              <label class="amount">
+                <input type="radio" name="amount" value={a} checked={a === start} />
+                <span>£{a}</span>
+              </label>
+            ))}
+          </div>
+          <label class="field"><span>Who is it for?</span><input name="recipient" required maxlength="80" /></label>
+          <label class="field"><span>Who is it from?</span><input name="from" maxlength="80" /></label>
+          <label class="field"><span>Add a message (optional)</span><textarea name="message" rows="3" maxlength="400"></textarea></label>
+          <button class="btn" type="submit" disabled={!open}>{open ? 'Buy voucher' : 'Vouchers coming soon'}</button>
+          <p class="small error" role="alert"></p>
+        </form>
+        <ul class="meta stacked points">
+          {v.points.map((p, i) => <li><Icon name={pointIcons[i] ?? 'leaf'} /> {p}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.getElementById('voucher-form') as HTMLFormElement;
+  const amt = document.querySelector<HTMLElement>('[data-voucher-amt]')!;
+  const error = form.querySelector<HTMLElement>('.error')!;
+  const button = form.querySelector<HTMLButtonElement>('button')!;
+
+  form.addEventListener('change', () => {
+    const v = new FormData(form).get('amount');
+    if (v) amt.textContent = `£${v}`;
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    error.textContent = '';
+    button.disabled = true;
+    const data = Object.fromEntries(new FormData(form));
+    try {
+      const res = await fetch('/api/voucher', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (res.ok && out.url) { location.href = out.url; return; }
+      error.textContent = out.error ?? 'Something went wrong. Please try again.';
+    } catch {
+      error.textContent = 'Could not reach the site. Check your connection and try again.';
+    }
+    button.disabled = false;
+  });
+</script>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .voucher {
+    position: relative; aspect-ratio: 1.6 / 1; display: flex; flex-direction: column; justify-content: space-between;
+    background: var(--band); padding: clamp(24px, 4vw, 40px); transform: rotate(-2deg);
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,.7); overflow: hidden;
+  }
+  .voucher::after { content: ''; position: absolute; top: 0; bottom: 0; right: 26%; border-right: 2px dashed rgba(241,237,226,.25); }
+  .voucher :global(.v-logo) { height: clamp(48px, 7vw, 72px); width: auto; align-self: flex-start; }
+  .voucher .label { color: var(--ink-on-band); }
+  .amt { font-family: var(--display); font-weight: 600; font-size: clamp(3.5rem, 8vw, 6rem); line-height: 1; color: var(--lime-bright); }
+  .voucher .small { color: var(--ink-on-band); }
+  h2 { font-size: clamp(1.8rem, 4vw, 3rem); }
+  .amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .amount { position: relative; }
+  .amount input { position: absolute; opacity: 0; inset: 0; }
+  .amount span {
+    display: grid; place-items: center; min-height: 56px; border: 1px solid var(--line); background: var(--surface);
+    font-family: var(--display); font-size: 1.2rem; cursor: pointer;
+  }
+  .amount input:checked + span { background: var(--lime); color: var(--on-lime); border-color: var(--lime); }
+  .amount input:focus-visible + span { outline: 2px solid var(--lime); outline-offset: 3px; }
+  .error { color: var(--danger); }
+  .points { margin-top: 1.5rem; color: var(--ink-soft); }
+</style>

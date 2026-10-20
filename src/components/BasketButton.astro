@@ -1,0 +1,74 @@
+---
+import Icon from './Icon.astro';
+
+/* The one button that puts something in the basket, used on the shop grid
+   and on an item's own page. Its state is decided in the browser, because
+   two of the three inputs only exist there: what is already in this
+   visitor's basket, and what has sold since the page was built. */
+interface Props { id: string; comingSoon: boolean; sold: boolean; compact?: boolean }
+const { id, comingSoon, sold, compact = false } = Astro.props;
+---
+<button
+  type="button"
+  class:list={['btn', 'basket-btn', { 'btn-sm': compact }]}
+  data-basket-add={id}
+  data-coming-soon={comingSoon ? 'true' : undefined}
+  data-sold={sold ? 'true' : undefined}
+  disabled={comingSoon || sold}
+>
+  <span data-label>{sold ? 'Rehomed' : comingSoon ? 'Coming soon' : compact ? 'Add' : 'Add to basket'}</span>
+  {!compact && !comingSoon && !sold && <Icon name="plus" size={18} />}
+</button>
+
+<script>
+  import { add, has, subscribe } from '../lib/basket';
+
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-basket-add]')];
+
+  function render() {
+    for (const b of buttons) {
+      const id = b.dataset.basketAdd!;
+      const label = b.querySelector<HTMLElement>('[data-label]')!;
+      if (b.dataset.sold) { b.disabled = true; label.textContent = 'Rehomed'; continue; }
+      if (b.dataset.comingSoon) continue;
+      const inBasket = has(id);
+      b.classList.toggle('btn-ghost', inBasket);
+      label.textContent = inBasket ? 'In basket' : b.classList.contains('btn-sm') ? 'Add' : 'Add to basket';
+    }
+  }
+
+  for (const b of buttons) {
+    b.addEventListener('click', () => {
+      const id = b.dataset.basketAdd!;
+      /* A second press on "In basket" goes to the basket rather than doing
+         nothing, which is what people expect a button that says that to do. */
+      if (has(id)) { location.href = '/basket'; return; }
+      add(id);
+    });
+  }
+
+  /* What has sold since this page was built. The page is static, so without
+     this a pot bought ten minutes ago would still look available until the
+     next rebuild. A failed request changes nothing: the checkout checks
+     again regardless. */
+  if (buttons.length) {
+    fetch('/api/sold')
+      .then((r) => (r.ok ? r.json() : { sold: [] }))
+      .then(({ sold }: { sold: string[] }) => {
+        const set = new Set(sold);
+        for (const b of buttons) if (set.has(b.dataset.basketAdd!)) b.dataset.sold = 'true';
+        document.querySelectorAll<HTMLElement>('[data-product]').forEach((card) => {
+          if (set.has(card.dataset.product!)) card.dataset.sold = 'true';
+        });
+        render();
+      })
+      .catch(() => {});
+  }
+
+  render();
+  subscribe(render);
+</script>
+
+<style>
+  .basket-btn[disabled] { opacity: .55; }
+</style>

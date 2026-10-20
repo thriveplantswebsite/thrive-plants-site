@@ -1,0 +1,194 @@
+/* ============================================================
+   JUNGLE NIGHT — look 3 from the mockup, the one Mandie picked.
+
+   Dark green-black, olive bands, lime for emphasis, cream text. Tall
+   condensed capitals (Oswald, the face on the Carrd site she sent) for
+   headings, Jost for reading. Square corners throughout: the look is a
+   poster, not an app.
+
+   Every colour is a token here, so the "rejigging" she has asked for can be
+   done in this block without touching a component.
+   ============================================================ */
+
+:root {
+  --bg: #151b16;
+  --band: #4a6140;          /* olive bands, from the Carrd reference */
+  --surface: #1f2820;
+  --surface-2: #263127;
+  --ink: #f1ede2;           /* cream text */
+  --ink-soft: #bfc3b3;
+  --ink-on-band: #dce3cf;
+  --line: #34412f;
+  --lime: #c8dc98;
+  --lime-bright: #e4f0be;
+  --on-lime: #141a14;
+  --warm: #e6b47c;
+  --danger: #f0a08a;
+
+  --display: 'Oswald Variable', 'Arial Narrow', sans-serif;
+  --body: 'Jost Variable', system-ui, sans-serif;
+
+  --wrap: min(1200px, 100% - 32px);
+  --section: clamp(4rem, 9vw, 7.5rem);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --header-h: 76px;
+}
+@media (max-width: 560px) {
+  :root { --header-h: 64px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 12px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1.1rem;
+  font-weight: 350;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+
+:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+
+.wrap { width: var(--wrap); margin-inline: auto; }
+.wrap.narrow { width: min(820px, 100% - 32px); }
+
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: 600;
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0 0 0.5em;
+  text-wrap: balance;
+}
+h1 { font-size: clamp(3rem, 8.6vw, 7.4rem); }
+h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
+h3 { font-size: 1.6rem; line-height: 1.1; }
+h1 em, h2 em, h3 em { font-style: normal; color: var(--lime); }
+p { margin: 0 0 1em; }
+
+.lead { font-size: clamp(1.1rem, 1.6vw, 1.3rem); color: var(--ink-soft); max-width: 46ch; }
+
+.eyebrow {
+  display: block;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lime);
+  margin-bottom: 1rem;
+}
+.small { font-size: 0.9rem; color: var(--ink-soft); }
+.label {
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5em;
+  min-height: 52px; padding: 0.8em 1.6em;
+  border: 1.5px solid var(--lime);
+  border-radius: 0;
+  background: var(--lime); color: var(--on-lime);
+  font-family: var(--display); font-weight: 500; font-size: 1rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none; white-space: nowrap;
+  transition: transform 0.15s var(--ease), background-color 0.2s, color 0.2s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn .icon { width: 18px; height: 18px; }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: var(--bg); }
+.btn-sm { min-height: 42px; padding: 0.5em 1.15em; font-size: 0.92rem; }
+.btn-block { width: 100%; }
+.btn[disabled], .btn[aria-disabled='true'] { opacity: 0.45; pointer-events: none; transform: none; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 1.75rem; }
+
+.link-arrow {
+  display: inline-flex; align-items: center; gap: 0.4em;
+  font-family: var(--display); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500;
+  color: var(--lime); text-decoration: none;
+}
+.link-arrow .icon { width: 18px; height: 18px; transition: transform 0.2s var(--ease); }
+.link-arrow:hover .icon { transform: translateX(4px); }
+
+/* ---------- sections ---------- */
+.section { padding-block: var(--section); }
+.section-tight { padding-top: 2rem; }
+.band { background: var(--band); color: var(--ink); }
+.band .eyebrow, .band h2 em, .band h3 em { color: var(--lime-bright); }
+.band .lead, .band .section-intro, .band p { color: var(--ink-on-band); }
+
+.section-head { margin-bottom: clamp(2rem, 4vw, 3.5rem); border-top: 1px solid currentColor; padding-top: 1.5rem; }
+.section-head h2 { margin: 0; }
+.section-head.split { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px 48px; flex-wrap: wrap; }
+.section-intro { max-width: 40ch; color: var(--ink-soft); margin: 0; }
+
+.ph { overflow: hidden; background: var(--surface); }
+.ph img { width: 100%; height: 100%; object-fit: cover; }
+
+.card { background: var(--surface); padding: clamp(1.5rem, 3vw, 2.25rem); border: 1px solid var(--line); }
+.card > .icon { width: 30px; height: 30px; color: var(--lime); margin-bottom: 1rem; }
+.card p { color: var(--ink-soft); }
+
+/* ---------- page hero (inner pages) ---------- */
+.page-hero { background: var(--band); padding-block: clamp(3rem, 7vw, 6rem) clamp(3rem, 6vw, 5rem); }
+.page-hero .eyebrow, .page-hero h1 em { color: var(--lime-bright); }
+.page-hero .lead { color: var(--ink-on-band); }
+.page-hero h1 { max-width: 15ch; }
+.page-hero.compact h1 { font-size: clamp(2.6rem, 6.5vw, 5.6rem); max-width: none; }
+
+/* ---------- CTA band ---------- */
+.cta-band { background: var(--lime); color: var(--on-lime); padding-block: clamp(3rem, 7vw, 5.5rem); }
+.cta-band .wrap { display: flex; justify-content: space-between; align-items: center; gap: 24px 40px; flex-wrap: wrap; }
+.cta-band h2 { margin: 0; }
+.cta-band h2 em { color: #3e5a37; }
+.cta-band .btn { background: var(--on-lime); color: var(--lime); border-color: var(--on-lime); }
+
+/* ---------- lists ---------- */
+.meta { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.95rem; }
+.meta li { display: inline-flex; align-items: center; gap: 6px; }
+.meta .icon { width: 17px; height: 17px; color: var(--lime); flex-shrink: 0; }
+.meta.stacked { flex-direction: column; gap: 10px; }
+
+/* ---------- forms ---------- */
+.form { display: grid; gap: 18px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 7px; }
+.field > span { font-family: var(--display); font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+.field input, .field select, .field textarea {
+  width: 100%; min-height: 52px; padding: 0.8em 1em;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 0;
+  font-weight: 350; font-size: 1rem;
+}
+.field textarea { resize: vertical; min-height: 140px; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--lime); outline-offset: 0; border-color: var(--lime); }
+.form .btn { justify-self: start; }
+/* The honeypot. Hidden from people, irresistible to bots. */
+.hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ---------- reveal on scroll ---------- */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal.d1 { transition-delay: 0.08s; }
+.reveal.d2 { transition-delay: 0.16s; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+/* No JavaScript, no hidden content. */
+.no-js .reveal { opacity: 1; transform: none; }

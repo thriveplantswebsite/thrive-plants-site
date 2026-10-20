@@ -1,0 +1,135 @@
+{
+  "heroLine1": "Don't bin it.",
+  "heroLine2": "Book it in.",
+  "heroLead": "Sick, sad or struggling houseplant? Brown tips. Dropped leaves. Bugs you can't name. Bristol's houseplant hospital will diagnose, treat and revive it, from £8.",
+  "heroImage": "../../assets/images/pages/philodendron-sun.jpg",
+  "stepsHeading": "Rescue. Revive. Return.",
+  "steps": [
+    {
+      "title": "Rescue",
+      "body": "Book a slot to drop off, or we can pick up. Free collection for 3 or more plants, BS1 to BS9."
+    },
+    {
+      "title": "Revive",
+      "body": "Every plant is properly assessed and treated at the thrive Houseplant Hospital, from a quick repot to full pest treatment."
+    },
+    {
+      "title": "Return",
+      "body": "Your plant comes back revived, with its own care card so you know what it needs to thrive."
+    }
+  ],
+  "symptomsHeading": "Sound familiar?",
+  "symptomsIntro": "If your plant is ticking any of these boxes, it's time for a check-up. Tap one to book in.",
+  "symptoms": [
+    {
+      "label": "Bugs on the leaves",
+      "icon": "bug"
+    },
+    {
+      "label": "Yellowing leaves",
+      "icon": "leaf"
+    },
+    {
+      "label": "Monstera out of control",
+      "icon": "maximize-2"
+    },
+    {
+      "label": "Overwatered",
+      "icon": "droplets"
+    },
+    {
+      "label": "Roots sticking out",
+      "icon": "shovel"
+    },
+    {
+      "label": "Fungus gnats",
+      "icon": "bug-off"
+    },
+    {
+      "label": "Leaning over",
+      "icon": "sun"
+    },
+    {
+      "label": "Dusty leaves",
+      "icon": "wind"
+    },
+    {
+      "label": "Crispy brown tips",
+      "icon": "flame"
+    },
+    {
+      "label": "Forgot to water it",
+      "icon": "glass-water"
+    },
+    {
+      "label": "Leaves dropping off",
+      "icon": "arrow-down"
+    },
+    {
+      "label": "Thrive to the rescue",
+      "icon": "heart-pulse"
+    }
+  ],
+  "servicesHeading": "Plants, pots and proper care",
+  "services": [
+    {
+      "title": "Houseplant Hospital",
+      "body": "Diagnosis, repotting and pest treatment for plants that need a little help.",
+      "link": "/hospital",
+      "linkLabel": "Treatments and prices",
+      "image": "../../assets/images/pages/monstera-curtain.jpg"
+    },
+    {
+      "title": "Pre-loved pots and plants",
+      "body": "Healthy plants rehomed in second-hand ceramic pots. Each one is a one-off.",
+      "link": "/shop",
+      "linkLabel": "Visit the shop",
+      "image": "../../assets/images/pages/aglaonema-pink.jpg"
+    },
+    {
+      "title": "Offices and restaurants",
+      "body": "Plants supplied and looked after, so your space stays green without the stress.",
+      "link": "/business",
+      "linkLabel": "Plant care for business",
+      "image": "../../assets/images/pages/strelitzia-warm.jpg"
+    },
+    {
+      "title": "Gift vouchers",
+      "body": "Know someone with a plant on its last legs? Give them a check-up.",
+      "link": "/vouchers",
+      "linkLabel": "Buy a voucher",
+      "image": null
+    }
+  ],
+  "patientsHeading": "Recent patients",
+  "patients": [
+    {
+      "title": "Snake plant",
+      "note": "Root rot. Trimmed, dried out and repotted in gritty mix.",
+      "image": "../../assets/images/pages/snake-cream.jpg",
+      "placeholder": true
+    },
+    {
+      "title": "Lovely jade plant",
+      "note": "Mineral deposit build-up. Cleaned, flushed and fed.",
+      "image": "../../assets/images/pages/jade.jpg",
+      "placeholder": true
+    },
+    {
+      "title": "Calathea",
+      "note": "Crispy edges. A humidity plan and a new spot away from the radiator.",
+      "image": "../../assets/images/pages/calathea-head.jpg",
+      "placeholder": true
+    },
+    {
+      "title": "A monster of a Monstera",
+      "note": "Rootbound. Divided, staked and back home.",
+      "image": "../../assets/images/pages/monstera-beige.jpg",
+      "placeholder": true
+    }
+  ],
+  "aboutEyebrow": "Hey, I'm Mandie",
+  "aboutHeading": "Bristol's first houseplant hospital, born in my back garden.",
+  "aboutBody": "I've been helping revive friends' houseplants for decades, so a move to focus on plants wasn't that strange. If you need help with a plant, get in touch.",
+  "aboutImage": "../../assets/images/pages/mandie.jpg"
+}

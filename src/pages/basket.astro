@@ -1,0 +1,233 @@
+---
+import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { single, shopProducts } from '../lib/content';
+import { enabledMethods, formatPrice } from '../lib/shop';
+
+/* ============================================================
+   BASKET — rendered in the browser from the ids in localStorage.
+
+   The page is static, so it carries a small catalogue of every listed item
+   (id, name, price, thumbnail) and looks the basket's ids up in it. That is
+   for DISPLAY only. The checkout endpoint prices everything again from the
+   content, so editing this catalogue in a browser changes nothing that is
+   charged.
+   ============================================================ */
+
+const shop = await single('shopPage');
+const delivery = (await getCollection('delivery'))[0]?.data;
+const methods = delivery ? enabledMethods(delivery) : [];
+const districts = delivery?.local.districts ?? '';
+
+const catalogue = await Promise.all(
+  (await shopProducts()).map(async (p) => {
+    const thumb = await getImage({ src: p.data.images[0].image, width: 200, format: 'webp' });
+    return {
+      id: p.id,
+      title: p.data.title,
+      pot: p.data.pot,
+      price: p.data.price,
+      sold: p.data.status === 'sold',
+      thumb: thumb.src,
+    };
+  }),
+);
+---
+<Base title="Basket" noindex>
+  <section class="page-hero compact">
+    <div class="wrap"><span class="eyebrow">Your basket</span><h1>Ready to <em>rehome?</em></h1></div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="wrap basket-page" data-basket-page data-catalogue={JSON.stringify(catalogue)} data-methods={JSON.stringify(methods)} data-districts={districts} data-coming-soon={shop.comingSoon ? 'true' : undefined}>
+      <div class="empty" data-empty hidden>
+        <p class="lead">{shop.emptyBasket || 'Your basket is empty.'}</p>
+        <a href="/shop" class="btn">Visit the shop</a>
+      </div>
+
+      <div class="layout" data-full hidden>
+        <ul class="lines" data-lines></ul>
+
+        <aside class="summary card">
+          <h2>Getting it home</h2>
+          {methods.length === 0 ? (
+            <p>Collection and delivery are not set up yet. Please get in touch to arrange it.</p>
+          ) : (
+            <fieldset class="methods">
+              <legend class="label">Choose one</legend>
+              {methods.map((m, i) => (
+                <label class="method">
+                  <input type="radio" name="method" value={m.id} checked={i === 0} />
+                  <span>
+                    <strong>{m.label}</strong>
+                    <em>{m.price ? formatPrice(m.price) : 'Free'}</em>
+                    {m.note && <small>{m.note}</small>}
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+          )}
+
+          <label class="field postcode" data-postcode hidden>
+            <span>Your postcode</span>
+            <input type="text" name="postcode" autocomplete="postal-code" inputmode="text" placeholder="BS6 5AB" />
+            <small class="small" data-postcode-msg></small>
+          </label>
+
+          <dl class="totals">
+            <div><dt>Plants and pots</dt><dd data-subtotal>£0</dd></div>
+            <div><dt>Getting it home</dt><dd data-delivery>Free</dd></div>
+            <div class="total"><dt>Total</dt><dd data-total>£0</dd></div>
+          </dl>
+
+          <button class="btn btn-block" data-checkout type="button" disabled={shop.comingSoon}>
+            {shop.comingSoon ? 'The shop opens soon' : 'Pay securely'}
+          </button>
+          <p class="small" data-error role="alert"></p>
+          <p class="small">Payment is handled by Stripe. You'll get a receipt by email.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { read, remove, subscribe } from '../lib/basket';
+  import { formatPrice, deliversTo } from '../lib/shop';
+
+  interface Item { id: string; title: string; pot: string; price: number; sold: boolean; thumb: string }
+  interface Method { id: string; label: string; price: number }
+
+  const root = document.querySelector<HTMLElement>('[data-basket-page]')!;
+  const catalogue: Item[] = JSON.parse(root.dataset.catalogue ?? '[]');
+  const methods: Method[] = JSON.parse(root.dataset.methods ?? '[]');
+  const districts = root.dataset.districts ?? '';
+  const comingSoon = !!root.dataset.comingSoon;
+  const byId = new Map(catalogue.map((i) => [i.id, i]));
+
+  const $ = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+  const linesEl = $('[data-lines]');
+  const errorEl = $('[data-error]');
+  const postcodeWrap = $('[data-postcode]');
+  const postcodeInput = postcodeWrap.querySelector('input')!;
+  const postcodeMsg = $('[data-postcode-msg]');
+  const checkout = $<HTMLButtonElement>('[data-checkout]');
+
+  let sold = new Set<string>();
+
+  const method = (): Method | undefined => {
+    const v = root.querySelector<HTMLInputElement>('input[name="method"]:checked')?.value;
+    return methods.find((m) => m.id === v);
+  };
+
+  function lines(): Item[] {
+    /* Ids that are no longer in the shop are dropped quietly: a deleted
+       item should not leave a ghost line nobody can remove. */
+    return read().map((id) => byId.get(id)).filter((i): i is Item => !!i);
+  }
+
+  function render() {
+    const items = lines();
+    $('[data-empty]').hidden = items.length > 0;
+    $('[data-full]').hidden = items.length === 0;
+
+    linesEl.innerHTML = '';
+    for (const item of items) {
+      const gone = item.sold || sold.has(item.id);
+      const li = document.createElement('li');
+      li.className = 'line' + (gone ? ' gone' : '');
+      li.innerHTML = `
+        <img src="${item.thumb}" alt="" width="80" height="80" />
+        <div><a href="/shop/${item.id}"></a><span></span>${gone ? '<em>Rehomed while it was in your basket</em>' : ''}</div>
+        <b></b>
+        <button type="button" class="remove" aria-label="Remove">Remove</button>`;
+      li.querySelector('a')!.textContent = item.title;
+      li.querySelector('span')!.textContent = item.pot;
+      li.querySelector('b')!.textContent = formatPrice(item.price);
+      li.querySelector('button')!.addEventListener('click', () => remove(item.id));
+      linesEl.append(li);
+    }
+
+    const buyable = items.filter((i) => !i.sold && !sold.has(i.id));
+    const subtotal = buyable.reduce((n, i) => n + i.price, 0);
+    const m = method();
+    const deliveryPrice = m?.price ?? 0;
+    $('[data-subtotal]').textContent = formatPrice(subtotal);
+    $('[data-delivery]').textContent = deliveryPrice ? formatPrice(deliveryPrice) : 'Free';
+    $('[data-total]').textContent = formatPrice(subtotal + deliveryPrice);
+
+    postcodeWrap.hidden = m?.id !== 'local';
+    const postcodeOk = m?.id !== 'local' || deliversTo(postcodeInput.value, districts);
+    postcodeMsg.textContent =
+      m?.id === 'local' && postcodeInput.value.trim() && !postcodeOk
+        ? `Sorry, we only deliver to ${districts}. Collection is free.`
+        : '';
+    checkout.disabled = comingSoon || !buyable.length || !m || !postcodeOk;
+  }
+
+  root.addEventListener('change', render);
+  postcodeInput.addEventListener('input', render);
+
+  checkout.addEventListener('click', async () => {
+    errorEl.textContent = '';
+    checkout.disabled = true;
+    checkout.textContent = 'Taking you to payment…';
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ids: lines().map((i) => i.id), method: method()?.id, postcode: postcodeInput.value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) { location.href = data.url; return; }
+      if (Array.isArray(data.sold)) data.sold.forEach((id: string) => sold.add(id));
+      errorEl.textContent = data.error ?? 'Something went wrong. Please try again.';
+    } catch {
+      errorEl.textContent = 'Could not reach the site. Check your connection and try again.';
+    }
+    checkout.textContent = 'Pay securely';
+    render();
+  });
+
+  /* Mark anything that has sold since the page was built, as the shop does. */
+  fetch('/api/sold')
+    .then((r) => (r.ok ? r.json() : { sold: [] }))
+    .then((d: { sold: string[] }) => { sold = new Set(d.sold); render(); })
+    .catch(() => {});
+
+  render();
+  subscribe(render);
+</script>
+
+<style>
+  .layout { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+  .lines { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .lines :global(.line) { display: grid; grid-template-columns: 80px 1fr auto auto; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .lines :global(.line img) { width: 80px; height: 80px; object-fit: contain; background: var(--surface); padding: 6px; }
+  .lines :global(.line a) { display: block; font-family: var(--display); text-transform: uppercase; font-size: 1.15rem; text-decoration: none; }
+  .lines :global(.line span) { color: var(--ink-soft); font-size: .95rem; }
+  .lines :global(.line em) { display: block; color: var(--danger); font-style: normal; font-size: .9rem; }
+  .lines :global(.line.gone b) { text-decoration: line-through; color: var(--ink-soft); }
+  .lines :global(.remove) { background: none; border: 0; color: var(--ink-soft); text-decoration: underline; font-size: .9rem; }
+  @media (max-width: 560px) { .lines :global(.line) { grid-template-columns: 64px 1fr auto; } .lines :global(.line img) { width: 64px; height: 64px; } .lines :global(.remove) { grid-column: 2; justify-self: start; } }
+
+  .summary h2 { font-size: 1.8rem; }
+  .methods { border: 0; margin: 0 0 1rem; padding: 0; display: grid; gap: 10px; }
+  .methods legend { margin-bottom: 10px; }
+  .method { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--line); cursor: pointer; }
+  .method:has(input:checked) { border-color: var(--lime); }
+  .method input { accent-color: var(--lime); margin-top: 5px; }
+  .method strong { display: block; font-weight: 500; }
+  .method em { font-style: normal; color: var(--lime); }
+  .method small { display: block; color: var(--ink-soft); }
+  .postcode { margin-bottom: 1rem; }
+  .totals { margin: 1rem 0; display: grid; gap: 8px; }
+  .totals div { display: flex; justify-content: space-between; }
+  .totals dt { color: var(--ink-soft); }
+  .totals dd { margin: 0; }
+  .totals .total { padding-top: 10px; border-top: 1px solid var(--line); font-size: 1.2rem; }
+  .totals .total dt { color: var(--ink); }
+  [data-error] { color: var(--danger); margin-top: .75rem; }
+</style>

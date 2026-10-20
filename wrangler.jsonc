@@ -1,0 +1,21 @@
+{
+  /* Cloudflare Workers config. Astro writes the Worker to dist/_worker.js;
+     everything else in dist/ is served as static assets, the free and
+     unlimited kind of request. */
+  "name": "thrive-plants-site",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  /* drop-trailing-slash: serve /shop straight from shop/index.html. The
+     default redirects /shop to /shop/ first, an extra round trip on every
+     click, since every link on the site is written without the slash. */
+  "assets": { "binding": "ASSETS", "directory": "./dist", "html_handling": "drop-trailing-slash" },
+  "observability": { "enabled": true },
+
+  /* SOLD: one-off items that have sold or are mid-checkout (src/lib/sold.ts).
+     [PLACEHOLDER] id: create the namespace once with
+       npx wrangler kv namespace create SOLD
+     and paste the id it prints here (see SETUP.md). Locally, any value
+     works: `astro dev` and `wrangler dev` use a throwaway local store. */
+  "kv_namespaces": [{ "binding": "SOLD", "id": "REPLACE-WITH-KV-NAMESPACE-ID" }]
+}

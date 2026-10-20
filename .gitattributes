@@ -1,0 +1,6 @@
+# Keep Unix line endings everywhere: Cloudflare builds on Linux, and Windows
+# checkouts would otherwise convert every file.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary

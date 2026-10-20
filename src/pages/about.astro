@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+const [entry] = await getCollection('aboutPage');
+const a = entry.data;
+const { Content } = await render(entry);
+const icons = ['hand-heart', 'recycle', 'map-pin'];
+---
+<Base title="About" description="Hey, I'm Mandie. Bristol's first houseplant hospital was born in my back garden.">
+  <section class="page-hero compact">
+    <div class="wrap"><span class="eyebrow">About thrive</span><h1>{a.heading}</h1></div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="wrap grid">
+      {a.portrait && (
+        <div class="ph portrait">
+          <Image src={a.portrait} alt={a.portraitAlt} widths={[500, 900, 1200]} sizes="(max-width: 860px) 100vw, 50vw" loading="eager" />
+        </div>
+      )}
+      <div class="prose"><Content /></div>
+    </div>
+  </section>
+
+  {a.values.length > 0 && (
+    <section class="section band">
+      <div class="wrap values">
+        {a.values.map((v, i) => (
+          <div class="reveal"><Icon name={icons[i] ?? 'leaf'} size={30} /><h3>{v.title}</h3><p>{v.body}</p></div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <CtaBand heading="Got a plant that needs" emphasis="help?" label="Book it in" />
+</Base>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+  .portrait { aspect-ratio: 4 / 4.4; position: sticky; top: calc(var(--header-h) + 24px); }
+  .portrait :global(img) { object-position: 47% 75%; }
+  .prose :global(p) { color: var(--ink-soft); max-width: 52ch; }
+  .prose :global(p:first-child) { font-size: clamp(1.15rem, 1.6vw, 1.35rem); color: var(--ink); }
+  .prose :global(p:last-child) { font-family: var(--display); text-transform: uppercase; font-size: 1.5rem; line-height: 1.25; color: var(--ink); margin-top: 1.5rem; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .portrait { position: static; aspect-ratio: 4 / 3.4; } }
+  .values { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+  .values :global(.icon) { color: var(--lime-bright); margin-bottom: 1rem; }
+  .values p { margin: 0; }
+  @media (max-width: 760px) { .values { grid-template-columns: 1fr; } }
+</style>

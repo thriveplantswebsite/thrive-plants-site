@@ -1,0 +1,122 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { single, calLinks } from '../lib/content';
+
+/* ============================================================
+   BOOK — her real cal.com calendars, embedded.
+
+   These ARE her live booking pages, the same ones her Instagram bio links
+   to, shown inside the site with cal.com's official embed. A booking made
+   here lands in her cal.com account exactly as one made from Instagram,
+   and the slot disappears from both. Nothing here connects to her account:
+   the pages are public, and the embed is cal.com's supported way of showing
+   them on another website.
+
+   Dark theme and lime to match the site. If the embed cannot load (an ad
+   blocker, say), the plain links underneath still work.
+   ============================================================ */
+const page = await single('bookPage');
+const settings = await single('settings');
+const cal = calLinks(settings);
+---
+<Base title="Book in" description={page.intro}>
+  <section class="page-hero compact">
+    <div class="wrap"><span class="eyebrow">Book in your plant</span><h1>{page.heading}</h1></div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="wrap grid" data-cal-drop={cal.dropOff} data-cal-pick={cal.pickUp}>
+      <aside class="side">
+        <div class="tabs" role="tablist">
+          <button class="tab on" role="tab" aria-selected="true" data-tab="drop">Drop off</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="pick">Pick up</button>
+        </div>
+        <div data-info="drop">
+          <h2>{page.dropOffTitle}</h2>
+          <p>{page.dropOffBody}</p>
+        </div>
+        <div data-info="pick" hidden>
+          <h2>{page.pickUpTitle}</h2>
+          <p>{page.pickUpBody}</p>
+        </div>
+        <div class="help">
+          <p class="label">Not sure what it needs?</p>
+          {settings.whatsapp && <a class="btn btn-ghost btn-block" href={settings.whatsapp} target="_blank" rel="noopener"><Icon name="message-circle" /> WhatsApp Mandie</a>}
+        </div>
+      </aside>
+
+      <div>
+        <div id="cal-drop" class="cal" data-panel="drop"><p class="loading">Loading the calendar…</p></div>
+        <div id="cal-pick" class="cal" data-panel="pick" hidden><p class="loading">Loading the calendar…</p></div>
+        <p class="small">
+          Can't see the calendar?
+          <a href={`https://cal.com/${cal.dropOff}`} target="_blank" rel="noopener">Book a drop-off</a> or
+          <a href={`https://cal.com/${cal.pickUp}`} target="_blank" rel="noopener">book a pick-up</a> on cal.com.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  /* cal.com's own loader snippet, unchanged apart from formatting. It queues
+     calls until embed.js arrives, so the order below is safe. */
+  (function (C: any, A: string, L: string) {
+    const p = (a: any, ar: any) => a.q.push(ar);
+    const d = C.document;
+    C.Cal = C.Cal || function (...ar: any[]) {
+      const cal = C.Cal;
+      if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement('script')).src = A; cal.loaded = true; }
+      if (ar[0] === L) {
+        const api: any = function (...a: any[]) { p(api, a); };
+        const ns = ar[1];
+        api.q = api.q || [];
+        if (typeof ns === 'string') { cal.ns[ns] = cal.ns[ns] || api; p(cal.ns[ns], ar); p(cal, ['initNamespace', ns]); } else p(cal, ar);
+        return;
+      }
+      p(cal, ar);
+    };
+  })(window, 'https://app.cal.com/embed/embed.js', 'init');
+
+  const Cal = (window as any).Cal;
+  const root = document.querySelector<HTMLElement>('[data-cal-drop]')!;
+  const links = { drop: root.dataset.calDrop!, pick: root.dataset.calPick! };
+  const ui = { theme: 'dark', styles: { branding: { brandColor: '#c8dc98' } }, hideEventTypeDetails: true, layout: 'month_view' };
+
+  for (const key of ['drop', 'pick'] as const) {
+    Cal('init', key, { origin: 'https://cal.com' });
+    document.getElementById(`cal-${key}`)!.innerHTML = '';
+    Cal.ns[key]('inline', { elementOrSelector: `#cal-${key}`, calLink: links[key], config: { layout: 'month_view', theme: 'dark' } });
+    Cal.ns[key]('ui', ui);
+  }
+
+  function show(which: 'drop' | 'pick') {
+    document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((t) => {
+      const on = t.dataset.tab === which;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', String(on));
+    });
+    document.querySelectorAll<HTMLElement>('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== which));
+    document.querySelectorAll<HTMLElement>('[data-info]').forEach((p) => (p.hidden = p.dataset.info !== which));
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((t) => t.addEventListener('click', () => show(t.dataset.tab as 'drop' | 'pick')));
+  /* /book?type=pick-up opens on the pick-up calendar, for links from the
+     Plant Hospital page. */
+  if (new URLSearchParams(location.search).get('type') === 'pick-up') show('pick');
+</script>
+
+<style>
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .side { display: grid; gap: 1.5rem; }
+  .side h2 { font-size: 1.6rem; }
+  .side p { color: var(--ink-soft); }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); }
+  .tab { min-height: 48px; border: 0; background: transparent; font-family: var(--display); text-transform: uppercase; letter-spacing: .06em; }
+  .tab.on { background: var(--lime); color: var(--on-lime); }
+  .help { border-top: 1px solid var(--line); padding-top: 1.5rem; display: grid; gap: 10px; }
+  .cal { min-height: 560px; background: var(--surface); overflow: hidden; }
+  .loading { display: grid; place-items: center; min-height: 560px; color: var(--ink-soft); margin: 0; }
+  .small { margin-top: 1rem; }
+</style>

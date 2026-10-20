@@ -1,0 +1,18 @@
+# Copy to .dev.vars for local testing. Never commit .dev.vars.
+# On Cloudflare these go in: Workers & Pages > thrive-plants-site > Settings > Variables and Secrets.
+
+# Stripe, test mode first (sk_test_...). Dashboard > Developers > API keys.
+STRIPE_SECRET_KEY=
+# From the webhook endpoint you create for /api/stripe-webhook (whsec_...).
+STRIPE_WEBHOOK_SECRET=
+
+# Resend, for the enquiry forms.
+RESEND_API_KEY=
+ENQUIRY_TO=
+ENQUIRY_FROM=
+
+# Keystatic's GitHub sign-in. Created by Keystatic's setup screen; see SETUP.md.
+KEYSTATIC_GITHUB_CLIENT_ID=
+KEYSTATIC_GITHUB_CLIENT_SECRET=
+KEYSTATIC_SECRET=
+PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=

@@ -1,0 +1,41 @@
+{
+  "heading": "Green spaces, without the stress.",
+  "intro": "[PLACEHOLDER] We supply plants that suit your space and keep them looking their best with regular care visits, so you never have to think about it.",
+  "image": "../../assets/images/pages/palm.jpg",
+  "imageAlt": "An areca palm in a white pot",
+  "offers": [
+    {
+      "title": "Supply",
+      "body": "[PLACEHOLDER] The right plants for your light, layout and budget, potted in pre-loved ceramics where we can."
+    },
+    {
+      "title": "Care visits",
+      "body": "[PLACEHOLDER] Weekly, fortnightly or monthly: watering, feeding, cleaning leaves, pruning and pest checks."
+    },
+    {
+      "title": "Rescue",
+      "body": "[PLACEHOLDER] Struggling plants taken to the Houseplant Hospital and swapped out while they recover."
+    }
+  ],
+  "whoHeading": "Any space that should feel alive",
+  "who": [
+    {
+      "label": "Offices and studios",
+      "icon": "briefcase"
+    },
+    {
+      "label": "Restaurants",
+      "icon": "utensils-crossed"
+    },
+    {
+      "label": "Cafés and bars",
+      "icon": "coffee"
+    },
+    {
+      "label": "Shops and salons",
+      "icon": "store"
+    }
+  ],
+  "formHeading": "Tell us about your space",
+  "formIntro": "Where you are in Bristol, roughly how many plants, and what you have in mind. We'll get back to you to arrange a visit."
+}
