@@ -76,7 +76,7 @@ export default config({
     : {
         kind: 'github',
         /* [PLACEHOLDER] until the GitHub account exists. */
-        repo: { owner: 'REPLACE-WITH-GITHUB-OWNER', name: 'thrive-plants-site' },
+        repo: { owner: 'thriveplantswebsite', name: 'thrive-plants-site' },
       },
 
   ui: {

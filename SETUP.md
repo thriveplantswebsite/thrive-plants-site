@@ -12,11 +12,10 @@ handed to Mandie at the end by changing one password.
 
 ## 1. GitHub
 
-1. Create a GitHub account with the project email.
-2. Create a **private** repository called `thrive-plants-site`.
-3. In `keystatic.config.ts`, replace `REPLACE-WITH-GITHUB-OWNER` with the
-   account name.
-4. Push this folder to the repository.
+Done. The account is `thriveplantswebsite`, the repository is
+`thriveplantswebsite/thrive-plants-site` (public for now; it holds no
+secrets, and switching it to private later breaks nothing), and `duboispaceai`
+is a collaborator so pushes work from the build machine's existing login.
 
 Mandie will need to be able to sign in to this account (or be added as a
 collaborator) to use the editor, because every save in Keystatic is a commit
