@@ -17,5 +17,5 @@
        npx wrangler kv namespace create SOLD
      and paste the id it prints here (see SETUP.md). Locally, any value
      works: `astro dev` and `wrangler dev` use a throwaway local store. */
-  "kv_namespaces": [{ "binding": "SOLD", "id": "REPLACE-WITH-KV-NAMESPACE-ID" }]
+  "kv_namespaces": [{ "binding": "SOLD", "id": "555fa54c8669400daaaa4d954411dcee" }]
 }
